@@ -3,5 +3,9 @@
 version = 3
 
 [[package]]
+name = "esc_server"
+version = "0.1.0"
+
+[[package]]
 name = "escalation_client"
 version = "0.1.0"

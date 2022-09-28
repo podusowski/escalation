@@ -1,2 +1,2 @@
 [workspace]
-members = ["escalation_client"]
+members = ["escalation_client", "esc_server"]
