@@ -1,0 +1,2 @@
+[workspace]
+members = ["escalation_client"]
