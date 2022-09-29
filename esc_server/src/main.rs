@@ -10,7 +10,7 @@ async fn main() {
 
     loop {
         let (mut client, _) = listener.accept().await.unwrap();
-        let message = esc_common::read(&mut client).await;
+        let message = esc_common::receive(&mut client).await;
 
         match message {
             esc_common::Protocol::Ping => {

@@ -12,7 +12,7 @@ pub async fn send(client: &mut TcpStream, payload: Protocol) {
     client.write_all(&buf).await.unwrap();
 }
 
-pub async fn read(stream: &mut TcpStream) -> Protocol {
+pub async fn receive(stream: &mut TcpStream) -> Protocol {
     let size = stream.read_u32().await.unwrap() as usize;
     let mut buf = [0; 1024];
     stream.read_exact(&mut buf[0..size]).await.unwrap();
