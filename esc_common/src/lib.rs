@@ -30,6 +30,6 @@ pub enum Protocol {
 /// `bson` crate can't serialize `enum` directly as it doesn't appear as
 /// a "document" to it. This wrapper fixes it.
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Message {
+struct Message {
     pub value: Protocol,
 }
