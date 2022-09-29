@@ -12,5 +12,6 @@ async fn main() {
         let size = client.read_u32().await.unwrap() as usize;
         let mut buf = [0; 1024];
         client.read_exact(&mut buf[0..size]).await.unwrap();
+        let message: esc_common::Message = bson::from_reader(&buf[..]).unwrap();
     }
 }

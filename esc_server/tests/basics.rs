@@ -1,4 +1,4 @@
-use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 #[tokio::test]
 async fn basic_test() {
@@ -14,10 +14,18 @@ async fn basic_test() {
         }
     };
 
+    // Send a Ping.
     stream.write_u32(1).await.unwrap();
-    let ping = esc_common::Message{value: esc_common::Protocol::Ping};
+    let ping = esc_common::Message {
+        value: esc_common::Protocol::Ping,
+    };
     let buf = bson::to_vec(&ping).unwrap();
     stream.write_all(&buf).await.unwrap();
+
+    // Receive a Pong.
+    let size = stream.read_u32().await.unwrap();
+    let mut buf = vec![0u8; size as usize];
+    stream.read_exact(&mut buf).await.unwrap();
 
     eprintln!("{}", path);
 }
