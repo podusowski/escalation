@@ -17,10 +17,6 @@ async fn basic_test() {
     // Send a Ping.
     esc_common::send(&mut stream, esc_common::Protocol::Ping).await;
 
-    // Receive a Pong.
-    let size = stream.read_u32().await.unwrap();
-    let mut buf = vec![0u8; size as usize];
-    stream.read_exact(&mut buf).await.unwrap();
-
-    eprintln!("{}", path);
+    let pong = esc_common::receive(&mut stream).await;
+    assert!(matches!(pong, esc_common::Protocol::Pong));
 }
