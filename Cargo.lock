@@ -97,7 +97,10 @@ version = "0.1.0"
 name = "esc_common"
 version = "0.1.0"
 dependencies = [
+ "bson",
+ "log",
  "serde",
+ "tokio",
 ]
 
 [[package]]

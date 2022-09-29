@@ -5,3 +5,12 @@ edition = "2021"
 
 [dependencies]
 serde = { version = "1.0.145", features = ["derive"] }
+log = "0.4.17"
+tokio = { version = "1.21.2", features = [
+    "macros",
+    "rt-multi-thread",
+    "net",
+    "io-util",
+    "process",
+] }
+bson = "2.4.0"
