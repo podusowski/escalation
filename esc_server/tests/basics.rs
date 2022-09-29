@@ -15,7 +15,7 @@ async fn basic_test() {
     };
 
     stream.write_u32(1).await.unwrap();
-    let ping = esc_common::Protocol::Ping;
+    let ping = esc_common::Message{value: esc_common::Protocol::Ping};
     let buf = bson::to_vec(&ping).unwrap();
     stream.write_all(&buf).await.unwrap();
 
