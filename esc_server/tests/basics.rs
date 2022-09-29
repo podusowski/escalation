@@ -23,9 +23,9 @@ async fn basic_test() {
     stream.write_all(&buf).await.unwrap();
 
     // Receive a Pong.
-    //let size = stream.read_u32().await.unwrap();
-    //let mut buf = vec![0u8; size as usize];
-    //stream.read_exact(&mut buf).await.unwrap();
+    let size = stream.read_u32().await.unwrap();
+    let mut buf = vec![0u8; size as usize];
+    stream.read_exact(&mut buf).await.unwrap();
 
     eprintln!("{}", path);
 }
