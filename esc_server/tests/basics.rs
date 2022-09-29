@@ -16,7 +16,7 @@ async fn spawn_server() -> (tokio::process::Child, tokio::net::TcpStream) {
 
 #[tokio::test]
 async fn basic_test() {
-    let (_, mut stream) = spawn_server().await;
+    let (_process, mut stream) = spawn_server().await;
 
     esc_common::send(&mut stream, esc_common::Protocol::Ping).await;
 
