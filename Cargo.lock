@@ -25,9 +25,14 @@ name = "esc_client"
 version = "0.1.0"
 
 [[package]]
+name = "esc_common"
+version = "0.1.0"
+
+[[package]]
 name = "esc_server"
 version = "0.1.0"
 dependencies = [
+ "esc_common",
  "tokio",
 ]
 
