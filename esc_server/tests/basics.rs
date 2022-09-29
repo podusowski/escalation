@@ -1,5 +1,3 @@
-use tokio::io::AsyncReadExt;
-
 #[tokio::test]
 async fn basic_test() {
     let path = env!("CARGO_BIN_EXE_esc_server");
