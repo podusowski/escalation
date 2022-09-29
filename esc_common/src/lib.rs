@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
-use tokio::{net::TcpStream, io::AsyncWriteExt};
+use tokio::{
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::TcpStream,
+};
 
 pub async fn send(client: &mut TcpStream, payload: Protocol) {
     log::trace!("Sending {:?}", payload);
@@ -7,6 +10,15 @@ pub async fn send(client: &mut TcpStream, payload: Protocol) {
     let buf = bson::to_vec(&message).unwrap();
     client.write_u32(buf.len() as u32).await.unwrap();
     client.write_all(&buf).await.unwrap();
+}
+
+pub async fn read(stream: &mut TcpStream) -> Protocol {
+    let size = stream.read_u32().await.unwrap() as usize;
+    let mut buf = [0; 1024];
+    stream.read_exact(&mut buf[0..size]).await.unwrap();
+    let message: Message = bson::from_reader(&buf[..]).unwrap();
+    log::trace!("Received {:?}", message);
+    message.value
 }
 
 #[derive(Deserialize, Serialize, Debug)]
