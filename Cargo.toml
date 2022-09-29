@@ -1,2 +1,2 @@
 [workspace]
-members = ["esc_client", "esc_server"]
+members = ["esc_client", "esc_server", "esc_common"]

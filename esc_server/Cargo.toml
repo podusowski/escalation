@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+bson = "2.4.0"
+env_logger = "0.9.1"
+esc_common = { path = "../esc_common" }
+log = "0.4.17"
 tokio = { version = "1.21.2", features = [
     "macros",
     "rt-multi-thread",
