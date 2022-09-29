@@ -1,4 +1,4 @@
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncWriteExt, AsyncReadExt};
 
 #[tokio::test]
 async fn basic_test() {
@@ -15,6 +15,9 @@ async fn basic_test() {
     };
 
     stream.write_u32(1).await.unwrap();
+    let ping = esc_common::Protocol::Ping;
+    let buf = bson::to_vec(&ping).unwrap();
+    stream.write_all(&buf).await.unwrap();
 
     eprintln!("{}", path);
 }
