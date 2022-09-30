@@ -5,10 +5,24 @@ fn spawn_entities(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    //commands.spawn().insert_bundle(PbrBundle {
+    //    mesh: meshes.add(Mesh::from(shape::Icosphere {
+    //        radius: 30.0,
+    //        subdivisions: 20,
+    //    })),
+    //    material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+    //    ..default()
+    //});
+
+    // Ship.
     commands.spawn().insert_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Icosphere {
-            radius: 30.0,
-            subdivisions: 20,
+        mesh: meshes.add(Mesh::from(shape::Box {
+            min_x: 0.,
+            max_x: 50.,
+            min_y: 0.,
+            max_y: 10.,
+            min_z: 0.,
+            max_z: 20.,
         })),
         material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
         ..default()
@@ -17,7 +31,7 @@ fn spawn_entities(
 
 fn spawn_lights_and_camera(mut commands: Commands) {
     commands.spawn_bundle(Camera3dBundle {
-        transform: Transform::from_xyz(0., 0., 500.0).looking_at(Vec3::ZERO, Vec3::Y),
+        transform: Transform::from_xyz(0., 0., 500.0).looking_at(Vec3::ZERO, Vec3::X),
         ..default()
     });
 
