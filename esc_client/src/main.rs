@@ -42,22 +42,33 @@ fn spawn_lights_and_camera(mut commands: Commands) {
     });
 }
 
+/// Data storage for the console.
 #[derive(Default)]
 struct Console {
-    lines: Vec<String>,
+    content: Vec<String>,
     command: String,
 }
 
-fn ui(mut egui_context: ResMut<EguiContext>, mut console: ResMut<Console>) {
+fn process_command(console: &mut Console, command: &str) {
+    match command {
+        "fly" => console.content.push("not implemented yet".to_owned()),
+        _ => console
+            .content
+            .push(format!("unknown command: {}", command)),
+    }
+}
+
+/// System for drawing and managing the console.
+fn console(mut egui_context: ResMut<EguiContext>, mut console: ResMut<Console>) {
     egui::Window::new("Console").show(egui_context.ctx_mut(), |ui| {
-        for line in &console.lines {
+        for line in &console.content {
             ui.label(line.as_str());
         }
 
         let response = ui.text_edit_singleline(&mut console.command);
         if response.lost_focus() && ui.input().key_pressed(egui::Key::Enter) {
             let command = std::mem::take(&mut console.command);
-            console.lines.push(command);
+            process_command(&mut console, &command);
         }
     });
 }
@@ -70,6 +81,6 @@ fn main() {
         .add_startup_system(spawn_entities)
         .add_startup_system(spawn_lights_and_camera)
         .insert_resource(Console::default())
-        .add_system(ui)
+        .add_system(console)
         .run();
 }
