@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_egui::{EguiContext, EguiPlugin};
 
 fn spawn_entities(
     mut commands: Commands,
@@ -41,11 +42,19 @@ fn spawn_lights_and_camera(mut commands: Commands) {
     });
 }
 
+fn ui(mut egui_context: ResMut<EguiContext>) {
+    egui::Window::new("Hello").show(egui_context.ctx_mut(), |ui| {
+        ui.label("world");
+    });
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(EguiPlugin)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .add_startup_system(spawn_entities)
         .add_startup_system(spawn_lights_and_camera)
+        .add_system(ui)
         .run();
 }
