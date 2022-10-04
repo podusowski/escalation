@@ -42,9 +42,23 @@ fn spawn_lights_and_camera(mut commands: Commands) {
     });
 }
 
-fn ui(mut egui_context: ResMut<EguiContext>) {
-    egui::Window::new("Hello").show(egui_context.ctx_mut(), |ui| {
-        ui.label("world");
+#[derive(Default)]
+struct Console {
+    lines: Vec<String>,
+    command: String,
+}
+
+fn ui(mut egui_context: ResMut<EguiContext>, mut console: ResMut<Console>) {
+    egui::Window::new("Console").show(egui_context.ctx_mut(), |ui| {
+        for line in &console.lines {
+            ui.label(line.as_str());
+        }
+
+        let response = ui.text_edit_singleline(&mut console.command);
+        if response.lost_focus() && ui.input().key_pressed(egui::Key::Enter) {
+            let command = std::mem::take(&mut console.command);
+            console.lines.push(command);
+        }
     });
 }
 
@@ -55,6 +69,7 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .add_startup_system(spawn_entities)
         .add_startup_system(spawn_lights_and_camera)
+        .insert_resource(Console::default())
         .add_system(ui)
         .run();
 }
