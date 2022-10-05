@@ -6,18 +6,21 @@ fn spawn_entities(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn().insert_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Box {
-            min_x: 0.,
-            max_x: 50.,
-            min_y: 0.,
-            max_y: 10.,
-            min_z: 0.,
-            max_z: 20.,
-        })),
-        material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-        ..default()
-    });
+    commands
+        .spawn()
+        .insert_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Box {
+                min_x: 0.,
+                max_x: 50.,
+                min_y: 0.,
+                max_y: 10.,
+                min_z: 0.,
+                max_z: 20.,
+            })),
+            material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+            ..default()
+        })
+        .insert(Destination { 0: Vec3::ZERO });
 }
 
 fn spawn_lights_and_camera(mut commands: Commands) {
@@ -31,6 +34,9 @@ fn spawn_lights_and_camera(mut commands: Commands) {
         brightness: 0.5,
     });
 }
+
+#[derive(Component)]
+struct Destination(Vec3);
 
 struct Fly {
     x: i32,
