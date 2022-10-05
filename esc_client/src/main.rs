@@ -42,6 +42,12 @@ fn spawn_lights_and_camera(mut commands: Commands) {
     });
 }
 
+struct Fly {
+    x: i32,
+    y: i32,
+    z: i32,
+}
+
 /// Data storage for the console.
 #[derive(Default)]
 struct Console {
@@ -49,12 +55,37 @@ struct Console {
     command: String,
 }
 
-fn process_command(console: &mut Console, command: &str) {
-    match command {
-        "fly" => console.content.push("not implemented yet".to_owned()),
-        _ => console
-            .content
-            .push(format!("unknown command: {}", command)),
+fn process_command(console: &mut Console, command: &str) -> Option<Fly> {
+    let command = command.split_whitespace().collect::<Vec<&str>>();
+    match command[0] {
+        "fly" => {
+            console.content.push("not implemented yet".to_owned());
+            Some(Fly {
+                x: command[1].parse().unwrap(),
+                y: command[2].parse().unwrap(),
+                z: command[3].parse().unwrap(),
+            })
+        }
+        _ => {
+            console
+                .content
+                .push(format!("unknown command: {}", command[0]));
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_fly_command() {
+        let mut console = Console::default();
+        let event = process_command(&mut console, "fly 1 2 3").unwrap();
+        assert_eq!(1, event.x);
+        assert_eq!(2, event.y);
+        assert_eq!(3, event.z);
     }
 }
 
