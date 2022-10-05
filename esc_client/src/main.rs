@@ -6,16 +6,6 @@ fn spawn_entities(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    //commands.spawn().insert_bundle(PbrBundle {
-    //    mesh: meshes.add(Mesh::from(shape::Icosphere {
-    //        radius: 30.0,
-    //        subdivisions: 20,
-    //    })),
-    //    material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-    //    ..default()
-    //});
-
-    // Ship.
     commands.spawn().insert_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Box {
             min_x: 0.,
