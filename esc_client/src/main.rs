@@ -35,6 +35,7 @@ fn spawn_lights_and_camera(mut commands: Commands) {
     });
 }
 
+/// The place where entity is flying to.
 #[derive(Component)]
 struct Destination(Vec3);
 
