@@ -22,6 +22,7 @@ fn spawn_entities(
             material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
             ..default()
         })
+        .insert(Ship)
         // FIXME: A temporary, hardcoded destination.
         .insert(Destination {
             start: Vec3::default(),
@@ -53,6 +54,10 @@ fn entities_movement(mut query: Query<(&mut Transform, &Destination)>) {
     }
 }
 
+/// Marker for the ships, that is entities which can fly somewhere.
+#[derive(Component)]
+struct Ship;
+
 /// The place where the ship is flying to.
 #[derive(Component)]
 struct Destination {
@@ -61,6 +66,7 @@ struct Destination {
     destination: Vec3,
 }
 
+#[derive(Debug)]
 struct Fly {
     x: i32,
     y: i32,
@@ -77,14 +83,11 @@ struct Console {
 fn process_command(console: &mut Console, command: &str) -> Option<Fly> {
     let command = command.split_whitespace().collect::<Vec<&str>>();
     match command[0] {
-        "fly" => {
-            console.content.push("not implemented yet".to_owned());
-            Some(Fly {
-                x: command[1].parse().unwrap(),
-                y: command[2].parse().unwrap(),
-                z: command[3].parse().unwrap(),
-            })
-        }
+        "fly" => Some(Fly {
+            x: command[1].parse().unwrap(),
+            y: command[2].parse().unwrap(),
+            z: command[3].parse().unwrap(),
+        }),
         _ => {
             console
                 .content
@@ -109,7 +112,12 @@ mod tests {
 }
 
 /// System for drawing and managing the console.
-fn console(mut egui_context: ResMut<EguiContext>, mut console: ResMut<Console>) {
+fn console(
+    mut egui_context: ResMut<EguiContext>,
+    mut console: ResMut<Console>,
+    mut commands: Commands,
+    ships: Query<(Entity, &Transform), With<Ship>>,
+) {
     egui::Window::new("Console").show(egui_context.ctx_mut(), |ui| {
         for line in &console.content {
             ui.label(line.as_str());
@@ -118,7 +126,22 @@ fn console(mut egui_context: ResMut<EguiContext>, mut console: ResMut<Console>) 
         let response = ui.text_edit_singleline(&mut console.command);
         if response.lost_focus() && ui.input().key_pressed(egui::Key::Enter) {
             let command = std::mem::take(&mut console.command);
-            process_command(&mut console, &command);
+
+            // TODO: Handling `process_command`'s result should probably be a
+            // separate system.
+            match dbg!(process_command(&mut console, &command)) {
+                Some(Fly { x, y, z }) => {
+                    for (ship, transform) in ships.iter() {
+                        console.content.push(format!("{:?} is moving", ship));
+                        commands.entity(ship).insert(Destination {
+                            start: transform.translation,
+                            start_time: Instant::now(),
+                            destination: Vec3::new(x as f32, y as f32, z as f32),
+                        });
+                    }
+                }
+                None => todo!(),
+            }
         }
     });
 }
