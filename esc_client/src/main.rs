@@ -22,13 +22,7 @@ fn spawn_entities(
             material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
             ..default()
         })
-        .insert(Ship)
-        // FIXME: A temporary, hardcoded destination.
-        .insert(Destination {
-            start: Vec3::default(),
-            start_time: Instant::now(),
-            destination: Vec3::new(10., 0., 0.),
-        });
+        .insert(Ship);
 }
 
 fn spawn_lights_and_camera(mut commands: Commands) {
