@@ -1,3 +1,5 @@
+use std::time::{Duration, Instant};
+
 use bevy::prelude::*;
 use bevy_egui::{EguiContext, EguiPlugin};
 
@@ -20,7 +22,12 @@ fn spawn_entities(
             material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
             ..default()
         })
-        .insert(Destination { 0: Vec3::ZERO });
+        // FIXME: A temporary, hardcoded destination.
+        .insert(Destination {
+            start: Vec3::default(),
+            start_time: Instant::now(),
+            destination: Vec3::new(10., 0., 0.),
+        });
 }
 
 fn spawn_lights_and_camera(mut commands: Commands) {
@@ -35,9 +42,24 @@ fn spawn_lights_and_camera(mut commands: Commands) {
     });
 }
 
-/// The place where entity is flying to.
+fn entities_movement(mut query: Query<(&mut Transform, &Destination)>) {
+    let speed = 1.;
+    for (mut transform, course) in query.iter_mut() {
+        let route = course.destination - course.start;
+        let elapsed = Instant::now() - course.start_time;
+        let estimated = Duration::from_secs_f32(route.length() / speed);
+        let progress = elapsed.as_secs_f32() / estimated.as_secs_f32();
+        transform.translation += route * progress;
+    }
+}
+
+/// The place where the ship is flying to.
 #[derive(Component)]
-struct Destination(Vec3);
+struct Destination {
+    start: Vec3,
+    start_time: Instant,
+    destination: Vec3,
+}
 
 struct Fly {
     x: i32,
@@ -107,6 +129,7 @@ fn main() {
         .add_plugin(EguiPlugin)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .add_startup_system(spawn_entities)
+        .add_system(entities_movement)
         .add_startup_system(spawn_lights_and_camera)
         .insert_resource(Console::default())
         .add_system(console)
