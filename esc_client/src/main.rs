@@ -111,8 +111,8 @@ fn console(
                     for (ship, transform) in ships.iter() {
                         console.content.push(format!("{:?} is moving", ship));
                         commands.entity(ship).insert(Movement {
-                            start: transform.translation,
-                            start_time: Instant::now(),
+                            start_point: transform.translation,
+                            when_started: Instant::now(),
                             destination: Vec3::new(x as f32, y as f32, z as f32),
                         });
                     }
