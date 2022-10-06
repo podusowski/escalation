@@ -1,32 +1,31 @@
+mod movement;
+mod ui;
+
 use bevy::prelude::*;
+use bevy_egui::EguiPlugin;
+use movement::entities_movement;
+use ui::ConsolePlugin;
 
 fn spawn_entities(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    //commands.spawn().insert_bundle(PbrBundle {
-    //    mesh: meshes.add(Mesh::from(shape::Icosphere {
-    //        radius: 30.0,
-    //        subdivisions: 20,
-    //    })),
-    //    material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-    //    ..default()
-    //});
-
-    // Ship.
-    commands.spawn().insert_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Box {
-            min_x: 0.,
-            max_x: 50.,
-            min_y: 0.,
-            max_y: 10.,
-            min_z: 0.,
-            max_z: 20.,
-        })),
-        material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-        ..default()
-    });
+    commands
+        .spawn()
+        .insert_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Box {
+                min_x: 0.,
+                max_x: 50.,
+                min_y: 0.,
+                max_y: 10.,
+                min_z: 0.,
+                max_z: 20.,
+            })),
+            material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+            ..default()
+        })
+        .insert(Ship);
 }
 
 fn spawn_lights_and_camera(mut commands: Commands) {
@@ -41,11 +40,18 @@ fn spawn_lights_and_camera(mut commands: Commands) {
     });
 }
 
+/// Marker for the ships, that is entities which can fly somewhere.
+#[derive(Component)]
+struct Ship;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(EguiPlugin)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .add_startup_system(spawn_entities)
+        .add_system(entities_movement)
         .add_startup_system(spawn_lights_and_camera)
+        .add_plugin(ConsolePlugin)
         .run();
 }
