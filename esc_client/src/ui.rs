@@ -1,7 +1,7 @@
 use crate::{movement::Movement, Ship};
 use bevy::prelude::*;
 use bevy_egui::EguiContext;
-use std::time::Instant;
+use std::{str::FromStr, time::Instant};
 use thiserror::Error;
 
 pub struct ConsolePlugin;
@@ -34,21 +34,25 @@ struct Fly {
     z: i32,
 }
 
-fn process_command(command: &str) -> Result<Fly, ParseCommandError> {
-    let command = command.split_whitespace().collect::<Vec<&str>>();
-    match command[0] {
-        "fly" => Ok(Fly {
-            x: command[1].parse().map_err(|_| {
-                ParseCommandError::InvalidArgument(command[0].to_owned(), command[1].to_owned())
-            })?,
-            y: command[2].parse().map_err(|_| {
-                ParseCommandError::InvalidArgument(command[0].to_owned(), command[2].to_owned())
-            })?,
-            z: command[3].parse().map_err(|_| {
-                ParseCommandError::InvalidArgument(command[0].to_owned(), command[3].to_owned())
-            })?,
-        }),
-        _ => Err(ParseCommandError::Unknown(command[0].to_owned())),
+impl FromStr for Fly {
+    type Err = ParseCommandError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let tokens = s.split_whitespace().collect::<Vec<&str>>();
+        match tokens[0] {
+            "fly" => Ok(Fly {
+                x: tokens[1].parse().map_err(|_| {
+                    ParseCommandError::InvalidArgument(tokens[0].to_owned(), tokens[1].to_owned())
+                })?,
+                y: tokens[2].parse().map_err(|_| {
+                    ParseCommandError::InvalidArgument(tokens[0].to_owned(), tokens[2].to_owned())
+                })?,
+                z: tokens[3].parse().map_err(|_| {
+                    ParseCommandError::InvalidArgument(tokens[0].to_owned(), tokens[3].to_owned())
+                })?,
+            }),
+            _ => Err(ParseCommandError::Unknown(tokens[0].to_owned())),
+        }
     }
 }
 
@@ -58,7 +62,7 @@ mod tests {
 
     #[test]
     fn parse_fly_command() {
-        let event = process_command("fly 1 2 3").unwrap();
+        let event = Fly::from_str("fly 1 2 3").unwrap();
         assert_eq!(1, event.x);
         assert_eq!(2, event.y);
         assert_eq!(3, event.z);
@@ -68,14 +72,14 @@ mod tests {
     fn parse_fly_command_with_errors() {
         assert_eq!(
             Err(ParseCommandError::Unknown("not_a_command".to_owned())),
-            process_command("not_a_command")
+            Fly::from_str("not_a_command")
         );
         assert_eq!(
             Err(ParseCommandError::InvalidArgument(
                 "fly".to_owned(),
                 "a".to_owned()
             )),
-            process_command("fly a b c")
+            Fly::from_str("fly a b c")
         );
     }
 }
@@ -98,7 +102,7 @@ fn console(
 
             // TODO: Handling `process_command`'s result should probably be a
             // separate system.
-            match dbg!(process_command(&command)) {
+            match Fly::from_str(&command) {
                 Ok(Fly { x, y, z }) => {
                     for (ship, transform) in ships.iter() {
                         console.content.push(format!("{:?} is moving", ship));
