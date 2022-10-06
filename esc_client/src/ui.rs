@@ -34,7 +34,7 @@ struct Fly {
     z: i32,
 }
 
-fn process_command(console: &mut Console, command: &str) -> Result<Fly, ParseCommandError> {
+fn process_command(command: &str) -> Result<Fly, ParseCommandError> {
     let command = command.split_whitespace().collect::<Vec<&str>>();
     match command[0] {
         "fly" => Ok(Fly {
@@ -58,8 +58,7 @@ mod tests {
 
     #[test]
     fn parse_fly_command() {
-        let mut console = Console::default();
-        let event = process_command(&mut console, "fly 1 2 3").unwrap();
+        let event = process_command("fly 1 2 3").unwrap();
         assert_eq!(1, event.x);
         assert_eq!(2, event.y);
         assert_eq!(3, event.z);
@@ -67,17 +66,16 @@ mod tests {
 
     #[test]
     fn parse_fly_command_with_errors() {
-        let mut console = Console::default();
         assert_eq!(
             Err(ParseCommandError::Unknown("not_a_command".to_owned())),
-            process_command(&mut console, "not_a_command")
+            process_command("not_a_command")
         );
         assert_eq!(
             Err(ParseCommandError::InvalidArgument(
                 "fly".to_owned(),
                 "a".to_owned()
             )),
-            process_command(&mut console, "fly a b c")
+            process_command("fly a b c")
         );
     }
 }
@@ -100,7 +98,7 @@ fn console(
 
             // TODO: Handling `process_command`'s result should probably be a
             // separate system.
-            match dbg!(process_command(&mut console, &command)) {
+            match dbg!(process_command(&command)) {
                 Ok(Fly { x, y, z }) => {
                     for (ship, transform) in ships.iter() {
                         console.content.push(format!("{:?} is moving", ship));
