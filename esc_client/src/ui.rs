@@ -29,6 +29,7 @@ fn process_command(console: &mut Console, command: &str) -> Option<Fly> {
     let command = command.split_whitespace().collect::<Vec<&str>>();
     match command[0] {
         "fly" => Some(Fly {
+            // TODO: Don't unwrap it.
             x: command[1].parse().unwrap(),
             y: command[2].parse().unwrap(),
             z: command[3].parse().unwrap(),
