@@ -1,7 +1,9 @@
-use std::time::{Duration, Instant};
+mod movement;
 
 use bevy::prelude::*;
 use bevy_egui::{EguiContext, EguiPlugin};
+use movement::{entities_movement, Destination};
+use std::time::Instant;
 
 fn spawn_entities(
     mut commands: Commands,
@@ -37,28 +39,9 @@ fn spawn_lights_and_camera(mut commands: Commands) {
     });
 }
 
-fn entities_movement(mut query: Query<(&mut Transform, &Destination)>) {
-    let speed = 1.;
-    for (mut transform, course) in query.iter_mut() {
-        let route = course.destination - course.start;
-        let elapsed = Instant::now() - course.start_time;
-        let estimated = Duration::from_secs_f32(route.length() / speed);
-        let progress = elapsed.as_secs_f32() / estimated.as_secs_f32();
-        transform.translation += route * progress;
-    }
-}
-
 /// Marker for the ships, that is entities which can fly somewhere.
 #[derive(Component)]
 struct Ship;
-
-/// The place where the ship is flying to.
-#[derive(Component)]
-struct Destination {
-    start: Vec3,
-    start_time: Instant,
-    destination: Vec3,
-}
 
 #[derive(Debug)]
 struct Fly {
