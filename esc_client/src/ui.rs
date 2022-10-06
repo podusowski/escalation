@@ -48,12 +48,7 @@ fn process_command(console: &mut Console, command: &str) -> Result<Fly, ParseCom
                 ParseCommandError::InvalidArgument(command[0].to_owned(), command[3].to_owned())
             })?,
         }),
-        _ => {
-            console
-                .content
-                .push(format!("unknown command: {}", command[0]));
-            Err(ParseCommandError::Unknown(command[0].to_owned()))
-        }
+        _ => Err(ParseCommandError::Unknown(command[0].to_owned())),
     }
 }
 
@@ -116,7 +111,9 @@ fn console(
                         });
                     }
                 }
-                Err(_) => todo!(),
+                Err(err) => {
+                    console.content.push(err.to_string());
+                }
             }
         }
     });
