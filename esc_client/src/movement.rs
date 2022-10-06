@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use std::time::{Duration, Instant};
 
+/// Updates positions of entities having `Movement` component.
 pub fn entities_movement(mut query: Query<(&mut Transform, &Movement)>) {
     let speed = 1.;
     for (mut transform, course) in query.iter_mut() {
