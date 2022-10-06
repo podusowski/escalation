@@ -2,7 +2,7 @@ mod movement;
 
 use bevy::prelude::*;
 use bevy_egui::{EguiContext, EguiPlugin};
-use movement::{entities_movement, Destination};
+use movement::{entities_movement, Movement};
 use std::time::Instant;
 
 fn spawn_entities(
@@ -110,7 +110,7 @@ fn console(
                 Some(Fly { x, y, z }) => {
                     for (ship, transform) in ships.iter() {
                         console.content.push(format!("{:?} is moving", ship));
-                        commands.entity(ship).insert(Destination {
+                        commands.entity(ship).insert(Movement {
                             start: transform.translation,
                             start_time: Instant::now(),
                             destination: Vec3::new(x as f32, y as f32, z as f32),
