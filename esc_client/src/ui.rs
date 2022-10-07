@@ -36,22 +36,26 @@ struct Fly {
     z: i32,
 }
 
+fn parse_argument<T: FromStr>(
+    tokens: &Vec<&str>,
+    n: usize,
+) -> Result<impl Into<T>, ParseCommandError> {
+    tokens[n]
+        .parse::<T>()
+        .map_err(|_| ParseCommandError::InvalidArgument(tokens[0].to_owned(), tokens[n].to_owned()))
+}
+
 impl FromStr for Fly {
     type Err = ParseCommandError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let tokens = s.split_whitespace().collect::<Vec<&str>>();
+
         match tokens[0] {
             "fly" => Ok(Fly {
-                x: tokens[1].parse().map_err(|_| {
-                    ParseCommandError::InvalidArgument(tokens[0].to_owned(), tokens[1].to_owned())
-                })?,
-                y: tokens[2].parse().map_err(|_| {
-                    ParseCommandError::InvalidArgument(tokens[0].to_owned(), tokens[2].to_owned())
-                })?,
-                z: tokens[3].parse().map_err(|_| {
-                    ParseCommandError::InvalidArgument(tokens[0].to_owned(), tokens[3].to_owned())
-                })?,
+                x: parse_argument(&tokens, 1)?.into(),
+                y: parse_argument(&tokens, 2)?.into(),
+                z: parse_argument(&tokens, 3)?.into(),
             }),
             _ => Err(ParseCommandError::Unknown(tokens[0].to_owned())),
         }
