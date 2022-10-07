@@ -13,11 +13,11 @@ async fn main() {
         let message = esc_common::receive(&mut client).await;
 
         match message {
-            esc_common::Protocol::Ping => {
+            Ok(esc_common::Protocol::Ping) => {
                 esc_common::send(&mut client, Protocol::Pong).await;
             }
             _ => {
-                log::warn!("Unknown message: {:?}", message)
+                log::warn!("Unknown message: {:?}", message);
             }
         }
     }

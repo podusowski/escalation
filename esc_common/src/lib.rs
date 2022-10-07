@@ -12,13 +12,13 @@ pub async fn send(client: &mut TcpStream, payload: Protocol) {
     client.write_all(&buf).await.unwrap();
 }
 
-pub async fn receive(stream: &mut TcpStream) -> Protocol {
-    let size = stream.read_u32().await.unwrap() as usize;
+pub async fn receive(stream: &mut TcpStream) -> std::io::Result<Protocol> {
+    let size = stream.read_u32().await? as usize;
     let mut buf = [0; 1024];
     stream.read_exact(&mut buf[0..size]).await.unwrap();
     let message: Message = bson::from_reader(&buf[..]).unwrap();
     log::trace!("Received {:?}", message.value);
-    message.value
+    Ok(message.value)
 }
 
 #[derive(Deserialize, Serialize, Debug)]
