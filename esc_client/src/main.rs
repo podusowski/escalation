@@ -47,11 +47,21 @@ struct Ship;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        // GUI
         .add_plugin(EguiPlugin)
+        .add_plugin(ConsolePlugin)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
+        // Networking
+        .insert_resource(
+            tokio::runtime::Builder::new_multi_thread()
+                .enable_all()
+                .build()
+                .unwrap(),
+        )
+        // Game logic
         .add_startup_system(spawn_entities)
         .add_system(entities_movement)
+        // Others
         .add_startup_system(spawn_lights_and_camera)
-        .add_plugin(ConsolePlugin)
         .run();
 }
