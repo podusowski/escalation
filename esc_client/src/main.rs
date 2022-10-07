@@ -1,4 +1,5 @@
 mod movement;
+mod networking;
 mod ui;
 
 use bevy::prelude::*;
@@ -58,6 +59,7 @@ fn main() {
                 .build()
                 .unwrap(),
         )
+        .add_startup_system(networking::networking)
         // Game logic
         .add_startup_system(spawn_entities)
         .add_system(entities_movement)
