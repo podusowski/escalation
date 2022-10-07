@@ -1,8 +1,11 @@
 use crate::{movement::Movement, Ship};
 use bevy::prelude::*;
 use bevy_egui::EguiContext;
-use std::time::Instant;
+use std::{str::FromStr, time::Instant};
+use thiserror::Error;
 
+/// Interacts with the user by providing a command line. Game can also emit
+/// messages on the console's backlog.
 pub struct ConsolePlugin;
 
 impl Plugin for ConsolePlugin {
@@ -18,27 +21,43 @@ struct Console {
     command: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error, PartialEq)]
+enum ParseCommandError {
+    #[error("unknown command: '{0}'")]
+    Unknown(String),
+    #[error("invalid argument for '{0}': '{1}'")]
+    InvalidArgument(String, String),
+}
+
+#[derive(Debug, PartialEq)]
 struct Fly {
     x: i32,
     y: i32,
     z: i32,
 }
 
-fn process_command(console: &mut Console, command: &str) -> Option<Fly> {
-    let command = command.split_whitespace().collect::<Vec<&str>>();
-    match command[0] {
-        "fly" => Some(Fly {
-            // TODO: Don't unwrap it.
-            x: command[1].parse().unwrap(),
-            y: command[2].parse().unwrap(),
-            z: command[3].parse().unwrap(),
-        }),
-        _ => {
-            console
-                .content
-                .push(format!("unknown command: {}", command[0]));
-            None
+fn parse_argument<T: FromStr>(
+    tokens: &[&str],
+    n: usize,
+) -> Result<impl Into<T>, ParseCommandError> {
+    tokens[n]
+        .parse::<T>()
+        .map_err(|_| ParseCommandError::InvalidArgument(tokens[0].to_owned(), tokens[n].to_owned()))
+}
+
+impl FromStr for Fly {
+    type Err = ParseCommandError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let tokens = s.split_whitespace().collect::<Vec<&str>>();
+
+        match tokens[0] {
+            "fly" => Ok(Fly {
+                x: parse_argument(&tokens, 1)?.into(),
+                y: parse_argument(&tokens, 2)?.into(),
+                z: parse_argument(&tokens, 3)?.into(),
+            }),
+            _ => Err(ParseCommandError::Unknown(tokens[0].to_owned())),
         }
     }
 }
@@ -49,11 +68,25 @@ mod tests {
 
     #[test]
     fn parse_fly_command() {
-        let mut console = Console::default();
-        let event = process_command(&mut console, "fly 1 2 3").unwrap();
+        let event = Fly::from_str("fly 1 2 3").unwrap();
         assert_eq!(1, event.x);
         assert_eq!(2, event.y);
         assert_eq!(3, event.z);
+    }
+
+    #[test]
+    fn parse_fly_command_with_errors() {
+        assert_eq!(
+            Err(ParseCommandError::Unknown("not_a_command".to_owned())),
+            Fly::from_str("not_a_command")
+        );
+        assert_eq!(
+            Err(ParseCommandError::InvalidArgument(
+                "fly".to_owned(),
+                "a".to_owned()
+            )),
+            Fly::from_str("fly a b c")
+        );
     }
 }
 
@@ -73,10 +106,9 @@ fn console(
         if response.lost_focus() && ui.input().key_pressed(egui::Key::Enter) {
             let command = std::mem::take(&mut console.command);
 
-            // TODO: Handling `process_command`'s result should probably be a
-            // separate system.
-            match dbg!(process_command(&mut console, &command)) {
-                Some(Fly { x, y, z }) => {
+            // TODO: Handling the result should probably be a separate system.
+            match Fly::from_str(&command) {
+                Ok(Fly { x, y, z }) => {
                     for (ship, transform) in ships.iter() {
                         console.content.push(format!("{:?} is moving", ship));
                         commands.entity(ship).insert(Movement {
@@ -86,7 +118,9 @@ fn console(
                         });
                     }
                 }
-                None => todo!(),
+                Err(err) => {
+                    console.content.push(err.to_string());
+                }
             }
         }
     });
