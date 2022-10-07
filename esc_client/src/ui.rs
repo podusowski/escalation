@@ -37,7 +37,7 @@ struct Fly {
 }
 
 fn parse_argument<T: FromStr>(
-    tokens: &Vec<&str>,
+    tokens: &[&str],
     n: usize,
 ) -> Result<impl Into<T>, ParseCommandError> {
     tokens[n]
