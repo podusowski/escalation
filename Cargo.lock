@@ -1484,7 +1484,9 @@ dependencies = [
  "bevy",
  "bevy_egui",
  "egui",
+ "esc_common",
  "thiserror",
+ "tokio",
 ]
 
 [[package]]
