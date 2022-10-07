@@ -4,6 +4,8 @@ use bevy_egui::EguiContext;
 use std::{str::FromStr, time::Instant};
 use thiserror::Error;
 
+/// Interacts with the user by providing a command line. Game can also emit
+/// messages on the console's backlog.
 pub struct ConsolePlugin;
 
 impl Plugin for ConsolePlugin {
@@ -100,8 +102,7 @@ fn console(
         if response.lost_focus() && ui.input().key_pressed(egui::Key::Enter) {
             let command = std::mem::take(&mut console.command);
 
-            // TODO: Handling `process_command`'s result should probably be a
-            // separate system.
+            // TODO: Handling the result should probably be a separate system.
             match Fly::from_str(&command) {
                 Ok(Fly { x, y, z }) => {
                     for (ship, transform) in ships.iter() {
