@@ -4,12 +4,12 @@ use tokio::{
     net::TcpStream,
 };
 
-pub async fn send(client: &mut TcpStream, payload: Protocol) {
+pub async fn send(stream: &mut TcpStream, payload: Protocol) {
     log::trace!("Sending {:?}", payload);
     let message = Message { value: payload };
     let buf = bson::to_vec(&message).unwrap();
-    client.write_u32(buf.len() as u32).await.unwrap();
-    client.write_all(&buf).await.unwrap();
+    stream.write_u32(buf.len() as u32).await.unwrap();
+    stream.write_all(&buf).await.unwrap();
 }
 
 pub async fn receive(stream: &mut TcpStream) -> std::io::Result<Protocol> {
