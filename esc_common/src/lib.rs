@@ -13,6 +13,7 @@ pub async fn send(stream: &mut TcpStream, message: Message) {
 }
 
 pub async fn receive(stream: &mut TcpStream) -> std::io::Result<Message> {
+    // TODO: Handle ridiculous (too big) sizes.
     let size = stream.read_u32().await? as usize;
     let mut buf = [0; 1024];
     stream.read_exact(&mut buf[0..size]).await.unwrap();
