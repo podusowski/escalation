@@ -11,7 +11,7 @@ pub fn networking(runtime: Res<Runtime>) {
 
         info!("Connected to server.");
 
-        esc_common::send(&mut stream, esc_common::Protocol::Ping).await;
+        esc_common::send(&mut stream, esc_common::Message::Ping).await;
         let _ = esc_common::receive(&mut stream).await.unwrap();
         info!("Got pong.")
     });

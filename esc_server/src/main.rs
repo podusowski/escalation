@@ -1,4 +1,4 @@
-use esc_common::Protocol;
+use esc_common::Message;
 use tokio::net::TcpListener;
 
 #[tokio::main]
@@ -14,8 +14,8 @@ async fn main() {
         let message = esc_common::receive(&mut client).await;
 
         match message {
-            Ok(esc_common::Protocol::Ping) => {
-                esc_common::send(&mut client, Protocol::Pong).await;
+            Ok(esc_common::Message::Ping) => {
+                esc_common::send(&mut client, Message::Pong).await;
             }
             _ => {
                 log::warn!("Unknown message: {:?}", message);

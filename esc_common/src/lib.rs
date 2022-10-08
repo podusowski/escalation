@@ -4,25 +4,25 @@ use tokio::{
     net::TcpStream,
 };
 
-pub async fn send(stream: &mut TcpStream, payload: Protocol) {
-    log::trace!("Sending {:?}", payload);
-    let message = Message { value: payload };
+pub async fn send(stream: &mut TcpStream, message: Message) {
+    log::trace!("Sending {:?}", message);
+    let message = Envelope { message };
     let buf = bson::to_vec(&message).unwrap();
     stream.write_u32(buf.len() as u32).await.unwrap();
     stream.write_all(&buf).await.unwrap();
 }
 
-pub async fn receive(stream: &mut TcpStream) -> std::io::Result<Protocol> {
+pub async fn receive(stream: &mut TcpStream) -> std::io::Result<Message> {
     let size = stream.read_u32().await? as usize;
     let mut buf = [0; 1024];
     stream.read_exact(&mut buf[0..size]).await.unwrap();
-    let message: Message = bson::from_reader(&buf[..]).unwrap();
-    log::trace!("Received {:?}", message.value);
-    Ok(message.value)
+    let envelop: Envelope = bson::from_reader(&buf[..]).unwrap();
+    log::trace!("Received {:?}", envelop.message);
+    Ok(envelop.message)
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub enum Protocol {
+pub enum Message {
     Ping,
     Pong,
 }
@@ -30,6 +30,6 @@ pub enum Protocol {
 /// `bson` crate can't serialize `enum` directly as it doesn't appear as
 /// a "document" to it. This wrapper fixes it.
 #[derive(Deserialize, Serialize, Debug)]
-struct Message {
-    pub value: Protocol,
+struct Envelope {
+    pub message: Message,
 }

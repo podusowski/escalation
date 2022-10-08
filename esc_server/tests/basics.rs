@@ -26,10 +26,10 @@ async fn spawn_server_and_connect() -> (tokio::process::Child, tokio::net::TcpSt
 async fn basic_test() {
     let (_process, mut stream) = spawn_server_and_connect().await;
 
-    esc_common::send(&mut stream, esc_common::Protocol::Ping).await;
+    esc_common::send(&mut stream, esc_common::Message::Ping).await;
 
     let pong = esc_common::receive(&mut stream).await;
-    assert!(matches!(pong, Ok(esc_common::Protocol::Pong)));
+    assert!(matches!(pong, Ok(esc_common::Message::Pong)));
 }
 
 #[tokio::test]
