@@ -6,6 +6,10 @@ async fn main() {
     env_logger::init();
 
     let listener = TcpListener::bind("localhost:1234").await.unwrap();
+
+    // This line is parser by the tests.
+    eprintln!("listening on port: 1234");
+
     log::info!("Listening on port 1234.");
 
     loop {

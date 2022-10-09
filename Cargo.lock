@@ -1507,6 +1507,7 @@ dependencies = [
  "env_logger 0.9.1",
  "esc_common",
  "log",
+ "regex",
  "tokio",
 ]
 

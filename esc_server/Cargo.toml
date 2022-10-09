@@ -15,3 +15,6 @@ tokio = { version = "1.21.2", features = [
     "io-util",
     "process",
 ] }
+
+[dev-dependencies]
+regex = "1"
