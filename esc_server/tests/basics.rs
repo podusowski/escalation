@@ -8,6 +8,8 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 async fn spawn_server() -> (tokio::process::Child, u16) {
     let path = env!("CARGO_BIN_EXE_esc_server");
     let mut child = tokio::process::Command::new(path)
+        .arg("--port")
+        .arg("0")
         .kill_on_drop(true)
         .stderr(Stdio::piped())
         .spawn()
