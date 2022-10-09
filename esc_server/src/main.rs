@@ -1,23 +1,38 @@
-use esc_common::Protocol;
+use std::net::{Ipv4Addr, SocketAddrV4};
+
+use clap::Parser;
+use esc_common::Message;
 use tokio::net::TcpListener;
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long, default_value_t = 1234)]
+    port: u16,
+}
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
+    let args = Args::parse();
+    let addr = SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, args.port);
+    let listener = TcpListener::bind(addr).await.unwrap();
+    let addr = listener.local_addr().unwrap();
 
-    let listener = TcpListener::bind("localhost:1234").await.unwrap();
-    log::info!("Listening on port 1234");
+    // Make sure we print the port on stderr because tests are expecting it.
+    eprintln!("listening on port: {}", addr.port());
+    log::info!("Listening on port: {}.", addr.port());
 
     loop {
-        let (mut client, _) = listener.accept().await.unwrap();
+        let (mut client, addr) = listener.accept().await.unwrap();
+        log::info!("Connection from '{}' established.", addr);
         let message = esc_common::receive(&mut client).await;
 
         match message {
-            esc_common::Protocol::Ping => {
-                esc_common::send(&mut client, Protocol::Pong).await;
+            Ok(esc_common::Message::Ping) => {
+                esc_common::send(&mut client, Message::Pong).await;
             }
             _ => {
-                log::warn!("Unknown message: {:?}", message)
+                log::warn!("Unknown message: {:?}", message);
             }
         }
     }

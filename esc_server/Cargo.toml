@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 bson = "2.4.0"
+clap = { version = "4.0.11", features = ["derive"] }
 env_logger = "0.9.1"
 esc_common = { path = "../esc_common" }
 log = "0.4.17"
@@ -15,3 +16,6 @@ tokio = { version = "1.21.2", features = [
     "io-util",
     "process",
 ] }
+
+[dev-dependencies]
+regex = "1"
