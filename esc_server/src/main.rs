@@ -7,10 +7,9 @@ async fn main() {
 
     let listener = TcpListener::bind("localhost:1234").await.unwrap();
 
-    // This line is parser by the tests.
+    // Make sure we print the port on stderr because tests are expecting it.
     eprintln!("listening on port: 1234");
-
-    log::info!("Listening on port 1234.");
+    log::info!("Listening on port: 1234.");
 
     loop {
         let (mut client, addr) = listener.accept().await.unwrap();

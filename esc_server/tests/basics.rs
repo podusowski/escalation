@@ -25,7 +25,7 @@ async fn spawn_server() -> (tokio::process::Child, u16) {
             .next_line()
             .await
             .expect("error while reading output")
-            .expect("stream has ended");
+            .expect("stream has ended, but did not find the port");
         if let Some(captures) = port_pattern.captures(&line) {
             let port: u16 = captures.get(1).unwrap().as_str().parse().unwrap();
             break port;
