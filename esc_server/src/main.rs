@@ -1,13 +1,20 @@
 use std::net::{Ipv4Addr, SocketAddrV4};
 
+use clap::Parser;
 use esc_common::Message;
 use tokio::net::TcpListener;
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long, default_value_t = 1234)]
+    port: u16,
+}
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
-
-    let addr = SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 1234);
+    let args = Args::parse();
+    let addr = SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, args.port);
     let listener = TcpListener::bind(addr).await.unwrap();
     let addr = listener.local_addr().unwrap();
 
