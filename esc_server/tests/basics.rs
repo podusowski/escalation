@@ -25,6 +25,9 @@ async fn spawn_server() -> (tokio::process::Child, u16) {
     )
     .lines();
 
+    // TODO: Currently there is no way of reading server's log output. One way
+    //       of solving this without loosing the port is to spawn a task which
+    //       continuously reads the output and flushes it on the test's log.
     let port = loop {
         let line = stdout
             .next_line()
