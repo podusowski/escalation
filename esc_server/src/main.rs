@@ -1,3 +1,5 @@
+use std::net::{Ipv4Addr, SocketAddrV4};
+
 use esc_common::Message;
 use tokio::net::TcpListener;
 
@@ -5,11 +7,13 @@ use tokio::net::TcpListener;
 async fn main() {
     env_logger::init();
 
-    let listener = TcpListener::bind("localhost:1234").await.unwrap();
+    let addr = SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 1234);
+    let listener = TcpListener::bind(addr).await.unwrap();
+    let addr = listener.local_addr().unwrap();
 
     // Make sure we print the port on stderr because tests are expecting it.
-    eprintln!("listening on port: 1234");
-    log::info!("Listening on port: 1234.");
+    eprintln!("listening on port: {}", addr.port());
+    log::info!("Listening on port: {}.", addr.port());
 
     loop {
         let (mut client, addr) = listener.accept().await.unwrap();
