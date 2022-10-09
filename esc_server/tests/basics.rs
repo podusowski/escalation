@@ -1,4 +1,7 @@
-use std::process::Stdio;
+use std::{
+    net::{Ipv4Addr, SocketAddrV4},
+    process::Stdio,
+};
 
 use tokio::io::{AsyncBufReadExt, BufReader};
 
@@ -35,9 +38,10 @@ async fn spawn_server() -> (tokio::process::Child, u16) {
     (child, port)
 }
 
-async fn connect() -> tokio::net::TcpStream {
+async fn connect(port: u16) -> tokio::net::TcpStream {
+    let addr = SocketAddrV4::new(Ipv4Addr::LOCALHOST, port);
     let stream = loop {
-        if let Ok(stream) = tokio::net::TcpStream::connect("localhost:1234").await {
+        if let Ok(stream) = tokio::net::TcpStream::connect(addr).await {
             break stream;
         }
     };
@@ -47,7 +51,7 @@ async fn connect() -> tokio::net::TcpStream {
 
 async fn spawn_server_and_connect() -> (tokio::process::Child, tokio::net::TcpStream) {
     let (process, port) = spawn_server().await;
-    let stream = connect().await;
+    let stream = connect(port).await;
     (process, stream)
 }
 
@@ -63,14 +67,14 @@ async fn basic_test() {
 
 #[tokio::test]
 async fn can_connect_multiple_times() {
-    let _process = spawn_server().await;
+    let (_process, port) = spawn_server().await;
 
     // One by one.
     {
-        let _stream = connect().await;
+        let _stream = connect(port).await;
     }
 
     {
-        let _stream = connect().await;
+        let _stream = connect(port).await;
     }
 }
