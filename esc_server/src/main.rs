@@ -31,6 +31,12 @@ async fn main() {
             Ok(esc_common::Message::Ping) => {
                 esc_common::send(&mut client, Message::Pong).await;
             }
+            Ok(esc_common::Message::Login {
+                login: _,
+                password: _,
+            }) => {
+                esc_common::send(&mut client, Message::LoggedIn { id: 1 }).await;
+            }
             _ => {
                 log::warn!("Unknown message: {:?}", message);
             }
