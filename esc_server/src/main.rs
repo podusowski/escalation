@@ -19,7 +19,7 @@ async fn main() {
     let addr = listener.local_addr().unwrap();
 
     // Make sure we print the port on stderr because tests are expecting it.
-    eprintln!("listening on port: {}", addr.port());
+    println!("listening on port: {}", addr.port());
     log::info!("Listening on port: {}.", addr.port());
 
     loop {
