@@ -26,6 +26,8 @@ pub async fn receive(stream: &mut TcpStream) -> std::io::Result<Message> {
 pub enum Message {
     Ping,
     Pong,
+    Login { login: String, password: String },
+    LoggedIn { id: usize },
 }
 
 /// `bson` crate can't serialize `enum` directly as it doesn't appear as

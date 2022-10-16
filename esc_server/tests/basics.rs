@@ -1,8 +1,8 @@
+use assert_matches::assert_matches;
 use std::{
     net::{Ipv4Addr, SocketAddrV4},
     process::Stdio,
 };
-
 use tokio::io::{AsyncBufReadExt, BufReader};
 
 async fn spawn_server() -> (tokio::process::Child, u16) {
@@ -82,4 +82,21 @@ async fn can_connect_multiple_times() {
     {
         let _stream = connect(port).await;
     }
+}
+
+#[tokio::test]
+async fn login() {
+    let (_process, mut stream) = spawn_server_and_connect().await;
+
+    esc_common::send(
+        &mut stream,
+        esc_common::Message::Login {
+            login: "login1".to_owned(),
+            password: "password1".to_owned(),
+        },
+    )
+    .await;
+
+    let logged_in = esc_common::receive(&mut stream).await;
+    assert_matches!(logged_in, Ok(esc_common::Message::LoggedIn { id: _ }));
 }
