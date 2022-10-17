@@ -19,21 +19,30 @@ async fn main() {
     let addr = listener.local_addr().unwrap();
 
     // Make sure we print the port on stderr because tests are expecting it.
-    eprintln!("listening on port: {}", addr.port());
+    println!("listening on port: {}", addr.port());
     log::info!("Listening on port: {}.", addr.port());
 
     loop {
         let (mut client, addr) = listener.accept().await.unwrap();
         log::info!("Connection from '{}' established.", addr);
-        let message = esc_common::receive(&mut client).await;
 
-        match message {
-            Ok(esc_common::Message::Ping) => {
-                esc_common::send(&mut client, Message::Pong).await;
+        tokio::spawn(async move {
+            let message = esc_common::receive(&mut client).await;
+
+            match message {
+                Ok(esc_common::Message::Ping) => {
+                    esc_common::send(&mut client, Message::Pong).await;
+                }
+                Ok(esc_common::Message::Login {
+                    login: _,
+                    password: _,
+                }) => {
+                    esc_common::send(&mut client, Message::LoggedIn { id: 1 }).await;
+                }
+                _ => {
+                    log::warn!("Unknown message: {:?}", message);
+                }
             }
-            _ => {
-                log::warn!("Unknown message: {:?}", message);
-            }
-        }
+        });
     }
 }

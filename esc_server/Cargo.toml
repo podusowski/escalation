@@ -19,3 +19,4 @@ tokio = { version = "1.21.2", features = [
 
 [dev-dependencies]
 regex = "1"
+assert_matches = "*"

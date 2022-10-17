@@ -1,8 +1,8 @@
+use assert_matches::assert_matches;
 use std::{
     net::{Ipv4Addr, SocketAddrV4},
     process::Stdio,
 };
-
 use tokio::io::{AsyncBufReadExt, BufReader};
 
 async fn spawn_server() -> (tokio::process::Child, u16) {
@@ -11,7 +11,7 @@ async fn spawn_server() -> (tokio::process::Child, u16) {
         .arg("--port")
         .arg("0")
         .kill_on_drop(true)
-        .stderr(Stdio::piped())
+        .stdout(Stdio::piped())
         .spawn()
         .unwrap();
 
@@ -19,9 +19,9 @@ async fn spawn_server() -> (tokio::process::Child, u16) {
 
     let mut stdout = BufReader::new(
         child
-            .stderr
+            .stdout
             .as_mut()
-            .expect("child is missing stderr handle"),
+            .expect("child is missing stdout handle"),
     )
     .lines();
 
@@ -82,4 +82,37 @@ async fn can_connect_multiple_times() {
     {
         let _stream = connect(port).await;
     }
+}
+
+#[tokio::test]
+async fn holds_multiple_active_connections() {
+    let (_process, port) = spawn_server().await;
+
+    let mut stream1 = connect(port).await;
+    let mut stream2 = connect(port).await;
+
+    esc_common::send(&mut stream2, esc_common::Message::Ping).await;
+    let pong = esc_common::receive(&mut stream2).await;
+    assert!(matches!(pong, Ok(esc_common::Message::Pong)));
+
+    esc_common::send(&mut stream1, esc_common::Message::Ping).await;
+    let pong = esc_common::receive(&mut stream1).await;
+    assert!(matches!(pong, Ok(esc_common::Message::Pong)));
+}
+
+#[tokio::test]
+async fn login() {
+    let (_process, mut stream) = spawn_server_and_connect().await;
+
+    esc_common::send(
+        &mut stream,
+        esc_common::Message::Login {
+            login: "login1".to_owned(),
+            password: "password1".to_owned(),
+        },
+    )
+    .await;
+
+    let logged_in = esc_common::receive(&mut stream).await;
+    assert_matches!(logged_in, Ok(esc_common::Message::LoggedIn { id: _ }));
 }
