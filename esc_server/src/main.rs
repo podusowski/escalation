@@ -25,21 +25,24 @@ async fn main() {
     loop {
         let (mut client, addr) = listener.accept().await.unwrap();
         log::info!("Connection from '{}' established.", addr);
-        let message = esc_common::receive(&mut client).await;
 
-        match message {
-            Ok(esc_common::Message::Ping) => {
-                esc_common::send(&mut client, Message::Pong).await;
+        tokio::spawn(async move {
+            let message = esc_common::receive(&mut client).await;
+
+            match message {
+                Ok(esc_common::Message::Ping) => {
+                    esc_common::send(&mut client, Message::Pong).await;
+                }
+                Ok(esc_common::Message::Login {
+                    login: _,
+                    password: _,
+                }) => {
+                    esc_common::send(&mut client, Message::LoggedIn { id: 1 }).await;
+                }
+                _ => {
+                    log::warn!("Unknown message: {:?}", message);
+                }
             }
-            Ok(esc_common::Message::Login {
-                login: _,
-                password: _,
-            }) => {
-                esc_common::send(&mut client, Message::LoggedIn { id: 1 }).await;
-            }
-            _ => {
-                log::warn!("Unknown message: {:?}", message);
-            }
-        }
+        });
     }
 }
