@@ -33,6 +33,6 @@ pub fn networking(runtime: Res<Runtime>) {
         assert!(matches!(logged_in, Ok(Message::LoggedIn { .. })));
 
         let ships = receive(&mut stream).await;
-        assert!(matches!(ships, Ok(Message::Ships{ .. })));
+        assert!(matches!(ships, Ok(Message::Ships { .. })));
     });
 }
