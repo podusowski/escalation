@@ -1,4 +1,5 @@
 use assert_matches::assert_matches;
+use esc_common::{receive, Message};
 use std::{
     net::{Ipv4Addr, SocketAddrV4},
     process::Stdio,
@@ -115,4 +116,7 @@ async fn login() {
 
     let logged_in = esc_common::receive(&mut stream).await;
     assert_matches!(logged_in, Ok(esc_common::Message::LoggedIn { id: _ }));
+
+    let ships = receive(&mut stream).await;
+    assert_matches!(ships, Ok(Message::Ships(ships)) if ships == [1]);
 }

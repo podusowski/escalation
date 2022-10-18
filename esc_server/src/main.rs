@@ -18,6 +18,9 @@ async fn main() {
     let listener = TcpListener::bind(addr).await.unwrap();
     let addr = listener.local_addr().unwrap();
 
+    // Just some hardcoded identifiers for now.
+    let ships = [1];
+
     // Make sure we print the port on stderr because tests are expecting it.
     println!("listening on port: {}", addr.port());
     log::info!("Listening on port: {}.", addr.port());
@@ -38,6 +41,7 @@ async fn main() {
                     password: _,
                 }) => {
                     esc_common::send(&mut client, Message::LoggedIn { id: 1 }).await;
+                    esc_common::send(&mut client, Message::Ships(ships.to_vec())).await;
                 }
                 _ => {
                     log::warn!("Unknown message: {:?}", message);
