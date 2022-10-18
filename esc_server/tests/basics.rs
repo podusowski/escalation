@@ -4,7 +4,10 @@ use std::{
     net::{Ipv4Addr, SocketAddrV4},
     process::Stdio,
 };
-use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::{
+    io::{AsyncBufReadExt, BufReader},
+    net::TcpStream,
+};
 
 async fn spawn_server() -> (tokio::process::Child, u16) {
     let path = env!("CARGO_BIN_EXE_esc_server");
@@ -61,14 +64,17 @@ async fn spawn_server_and_connect() -> (tokio::process::Child, tokio::net::TcpSt
     (process, stream)
 }
 
+/// Send ping and expect response.
+async fn ping(stream: &mut TcpStream) {
+    esc_common::send(stream, esc_common::Message::Ping).await;
+    let pong = esc_common::receive(stream).await;
+    assert!(matches!(pong, Ok(esc_common::Message::Pong)));
+}
+
 #[tokio::test]
 async fn basic_test() {
     let (_process, mut stream) = spawn_server_and_connect().await;
-
-    esc_common::send(&mut stream, esc_common::Message::Ping).await;
-
-    let pong = esc_common::receive(&mut stream).await;
-    assert!(matches!(pong, Ok(esc_common::Message::Pong)));
+    ping(&mut stream).await;
 }
 
 #[tokio::test]
@@ -102,8 +108,10 @@ async fn holds_multiple_active_connections() {
 }
 
 #[tokio::test]
-async fn login() {
+async fn ping_login_and_get_ship_list() {
     let (_process, mut stream) = spawn_server_and_connect().await;
+
+    ping(&mut stream).await;
 
     esc_common::send(
         &mut stream,

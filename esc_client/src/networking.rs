@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use esc_common::send;
 use tokio::{net::TcpSocket, runtime::Runtime};
 
 pub fn networking(runtime: Res<Runtime>) {
@@ -13,6 +14,15 @@ pub fn networking(runtime: Res<Runtime>) {
 
         esc_common::send(&mut stream, esc_common::Message::Ping).await;
         let _ = esc_common::receive(&mut stream).await.unwrap();
-        info!("Got pong.")
+        info!("Got pong.");
+
+        send(
+            &mut stream,
+            esc_common::Message::Login {
+                login: "login1".to_owned(),
+                password: "password1".to_owned(),
+            },
+        )
+        .await;
     });
 }
