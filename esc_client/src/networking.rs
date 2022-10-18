@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use esc_common::send;
+use esc_common::{receive, send, Message};
 use tokio::{net::TcpSocket, runtime::Runtime};
 
 pub fn networking(runtime: Res<Runtime>) {
@@ -24,5 +24,15 @@ pub fn networking(runtime: Res<Runtime>) {
             },
         )
         .await;
+
+        // TODO: Move that logic to Bevy's system. Otherwise we won't be able
+        // to interact with the engine.
+
+        // TODO: Figure out how to handle errors in this context.
+        let logged_in = receive(&mut stream).await;
+        assert!(matches!(logged_in, Ok(Message::LoggedIn { .. })));
+
+        let ships = receive(&mut stream).await;
+        assert!(matches!(ships, Ok(Message::Ships{ .. })));
     });
 }

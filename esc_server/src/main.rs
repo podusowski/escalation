@@ -44,8 +44,13 @@ async fn main() {
                         esc_common::send(&mut client, Message::LoggedIn { id: 1 }).await;
                         esc_common::send(&mut client, Message::Ships(ships.to_vec())).await;
                     }
-                    _ => {
-                        log::warn!("Unknown message: {:?}", message);
+                    Ok(_) => {
+                        log::warn!("'{:?}' was unexpected here.", message);
+                        break;
+                    }
+                    Err(err) => {
+                        log::warn!("Error ocurred while receiving a message: {}", err);
+                        break;
                     }
                 }
             }
