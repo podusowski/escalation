@@ -2,8 +2,17 @@ use bevy::prelude::*;
 use esc_common::{receive, send, Message};
 use tokio::{net::TcpSocket, runtime::Runtime};
 
-pub fn networking(runtime: Res<Runtime>) {
-    runtime.spawn(async {
+pub fn handle_incoming_packets(mut receiver: ResMut<tokio::sync::mpsc::Receiver<Message>>) {
+    while let Ok(message) = receiver.try_recv() {
+        info!("Received '{:?}' in Bevy system.", message);
+    }
+}
+
+pub fn networking(mut commands: Commands, runtime: Res<Runtime>) {
+    let (sender, receiver) = tokio::sync::mpsc::channel::<Message>(10);
+    commands.insert_resource(receiver);
+
+    runtime.spawn(async move {
         let socket = TcpSocket::new_v4().unwrap();
         let mut stream = socket
             .connect("127.0.0.1:1234".parse().unwrap())
@@ -35,5 +44,7 @@ pub fn networking(runtime: Res<Runtime>) {
         let ships = receive(&mut stream).await;
         assert!(matches!(ships, Ok(Message::Ships { .. })));
         info!("Received list of the ships.");
+
+        sender.send(ships.unwrap()).await.unwrap();
     });
 }
