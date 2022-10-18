@@ -14,7 +14,7 @@ pub fn networking(runtime: Res<Runtime>) {
 
         esc_common::send(&mut stream, esc_common::Message::Ping).await;
         let _ = esc_common::receive(&mut stream).await.unwrap();
-        info!("Got pong.");
+        info!("Server is responding to ping.");
 
         send(
             &mut stream,
@@ -34,5 +34,6 @@ pub fn networking(runtime: Res<Runtime>) {
 
         let ships = receive(&mut stream).await;
         assert!(matches!(ships, Ok(Message::Ships { .. })));
+        info!("Received list of the ships.");
     });
 }
