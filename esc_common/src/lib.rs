@@ -28,6 +28,7 @@ pub enum Message {
     Pong,
     Login { login: String, password: String },
     LoggedIn { id: usize },
+    Ships(Vec<u32>),
 }
 
 /// `bson` crate can't serialize `enum` directly as it doesn't appear as
