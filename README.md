@@ -14,7 +14,7 @@ the logger so it might be beneficial to set `RUST_LOG` appropriately:
 
     cargo test --package esc_server
 
-# Running the client
+# Running server and client
 
 Bevy [has a number of tricks][bevy-fast-compile] which makes the compilation
 and the whole cycle faster. Most notable is using dynamic linking:
@@ -22,3 +22,10 @@ and the whole cycle faster. Most notable is using dynamic linking:
     RUST_LOG=info cargo run --features bevy/dynamic --bin esc_client
 
 [bevy-fast-compile]: https://bevyengine.org/learn/book/getting-started/setup/#enable-fast-compiles-optional
+
+Server doesn't use bevy, therefore it can be started like any rust binary:
+
+    RUST_LOG=info cargo run --bin esc_server
+
+Alternatively, you can use script `./r.sh` to build and start both server and
+client. When client is closed, server is terminated by the script as well.
