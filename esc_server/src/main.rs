@@ -30,21 +30,23 @@ async fn main() {
         log::info!("Connection from '{}' established.", addr);
 
         tokio::spawn(async move {
-            let message = esc_common::receive(&mut client).await;
+            loop {
+                let message = esc_common::receive(&mut client).await;
 
-            match message {
-                Ok(esc_common::Message::Ping) => {
-                    esc_common::send(&mut client, Message::Pong).await;
-                }
-                Ok(esc_common::Message::Login {
-                    login: _,
-                    password: _,
-                }) => {
-                    esc_common::send(&mut client, Message::LoggedIn { id: 1 }).await;
-                    esc_common::send(&mut client, Message::Ships(ships.to_vec())).await;
-                }
-                _ => {
-                    log::warn!("Unknown message: {:?}", message);
+                match message {
+                    Ok(esc_common::Message::Ping) => {
+                        esc_common::send(&mut client, Message::Pong).await;
+                    }
+                    Ok(esc_common::Message::Login {
+                        login: _,
+                        password: _,
+                    }) => {
+                        esc_common::send(&mut client, Message::LoggedIn { id: 1 }).await;
+                        esc_common::send(&mut client, Message::Ships(ships.to_vec())).await;
+                    }
+                    _ => {
+                        log::warn!("Unknown message: {:?}", message);
+                    }
                 }
             }
         });
