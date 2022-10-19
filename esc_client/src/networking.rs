@@ -9,6 +9,8 @@ pub fn handle_incoming_packets(mut receiver: ResMut<tokio::sync::mpsc::Receiver<
 }
 
 pub fn networking(mut commands: Commands, runtime: Res<Runtime>) {
+    // Channel for incoming messages. Sender is passed to Bevy as a resource
+    // for systems to use.
     let (sender, receiver) = tokio::sync::mpsc::channel::<Message>(10);
     commands.insert_resource(receiver);
 
