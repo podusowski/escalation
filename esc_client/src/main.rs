@@ -62,7 +62,6 @@ fn main() {
         .add_startup_system(networking::networking)
         .add_system(networking::handle_incoming_packets)
         // Game logic
-        .add_startup_system(spawn_entities)
         .add_system(entities_movement)
         // Others
         .add_startup_system(spawn_lights_and_camera)

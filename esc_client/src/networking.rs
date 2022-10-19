@@ -16,21 +16,23 @@ pub fn handle_incoming_packets(
             Message::Ships(ships) => {
                 info!("Received list of the ships: {:?}.", ships);
 
-                commands
-                    .spawn()
-                    .insert_bundle(PbrBundle {
-                        mesh: meshes.add(Mesh::from(shape::Box {
-                            min_x: 0.,
-                            max_x: 50.,
-                            min_y: 0.,
-                            max_y: 10.,
-                            min_z: 0.,
-                            max_z: 20.,
-                        })),
-                        material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-                        ..default()
-                    })
-                    .insert(Ship);
+                for _ship in ships {
+                    commands
+                        .spawn()
+                        .insert_bundle(PbrBundle {
+                            mesh: meshes.add(Mesh::from(shape::Box {
+                                min_x: 0.,
+                                max_x: 50.,
+                                min_y: 0.,
+                                max_y: 10.,
+                                min_z: 0.,
+                                max_z: 20.,
+                            })),
+                            material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+                            ..default()
+                        })
+                        .insert(Ship);
+                }
             }
             _ => {
                 warn!("Unknown message received: {:?}.", message);
