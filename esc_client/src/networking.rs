@@ -4,7 +4,8 @@ use tokio::{net::TcpSocket, runtime::Runtime};
 
 use crate::Ship;
 
-pub fn handle_incoming_packets(
+/// Process incoming network messages and apply them into the game's logic.
+pub fn incoming_packets(
     mut commands: Commands,
     mut receiver: ResMut<tokio::sync::mpsc::Receiver<Message>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -41,6 +42,7 @@ pub fn handle_incoming_packets(
     }
 }
 
+/// Set up the networking and provide `mpsc` channels for other systems.
 pub fn networking(mut commands: Commands, runtime: Res<Runtime>) {
     // Channel for incoming messages. Sender is passed to Bevy as a resource
     // for systems to use.

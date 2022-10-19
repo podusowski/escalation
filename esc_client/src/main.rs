@@ -38,7 +38,7 @@ fn main() {
                 .unwrap(),
         )
         .add_startup_system(networking::networking)
-        .add_system(networking::handle_incoming_packets)
+        .add_system(networking::incoming_packets)
         // Game logic
         .add_system(entities_movement)
         // Others
