@@ -2,9 +2,40 @@ use bevy::prelude::*;
 use esc_common::{receive, send, Message};
 use tokio::{net::TcpSocket, runtime::Runtime};
 
-pub fn handle_incoming_packets(mut receiver: ResMut<tokio::sync::mpsc::Receiver<Message>>) {
+use crate::Ship;
+
+pub fn handle_incoming_packets(
+    mut commands: Commands,
+    mut receiver: ResMut<tokio::sync::mpsc::Receiver<Message>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
     while let Ok(message) = receiver.try_recv() {
         info!("Received '{:?}' in Bevy system.", message);
+        match message {
+            Message::Ships(ships) => {
+                info!("Received list of the ships: {:?}.", ships);
+
+                commands
+                    .spawn()
+                    .insert_bundle(PbrBundle {
+                        mesh: meshes.add(Mesh::from(shape::Box {
+                            min_x: 0.,
+                            max_x: 50.,
+                            min_y: 0.,
+                            max_y: 10.,
+                            min_z: 0.,
+                            max_z: 20.,
+                        })),
+                        material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+                        ..default()
+                    })
+                    .insert(Ship);
+            }
+            _ => {
+                warn!("Unknown message received: {:?}.", message);
+            }
+        }
     }
 }
 
@@ -43,10 +74,9 @@ pub fn networking(mut commands: Commands, runtime: Res<Runtime>) {
         let logged_in = receive(&mut stream).await;
         assert!(matches!(logged_in, Ok(Message::LoggedIn { .. })));
 
-        let ships = receive(&mut stream).await;
-        assert!(matches!(ships, Ok(Message::Ships { .. })));
-        info!("Received list of the ships.");
-
-        sender.send(ships.unwrap()).await.unwrap();
+        loop {
+            let incoming = receive(&mut stream).await;
+            sender.send(incoming.unwrap()).await.unwrap();
+        }
     });
 }
