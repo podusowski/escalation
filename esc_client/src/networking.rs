@@ -2,8 +2,54 @@ use bevy::prelude::*;
 use esc_common::{receive, send, Message};
 use tokio::{net::TcpSocket, runtime::Runtime};
 
-pub fn networking(runtime: Res<Runtime>) {
-    runtime.spawn(async {
+use crate::Ship;
+
+/// Process incoming network messages and apply them into the game's logic.
+pub fn incoming_packets(
+    mut commands: Commands,
+    mut receiver: ResMut<tokio::sync::mpsc::Receiver<Message>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    while let Ok(message) = receiver.try_recv() {
+        info!("Received '{:?}' in Bevy system.", message);
+        match message {
+            Message::Ships(ships) => {
+                info!("Received list of the ships: {:?}.", ships);
+
+                for _ship in ships {
+                    commands
+                        .spawn()
+                        .insert_bundle(PbrBundle {
+                            mesh: meshes.add(Mesh::from(shape::Box {
+                                min_x: 0.,
+                                max_x: 50.,
+                                min_y: 0.,
+                                max_y: 10.,
+                                min_z: 0.,
+                                max_z: 20.,
+                            })),
+                            material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+                            ..default()
+                        })
+                        .insert(Ship);
+                }
+            }
+            _ => {
+                warn!("Unknown message received: {:?}.", message);
+            }
+        }
+    }
+}
+
+/// Set up the networking and provide `mpsc` channels for other systems.
+pub fn networking(mut commands: Commands, runtime: Res<Runtime>) {
+    // Channel for incoming messages. Sender is passed to Bevy as a resource
+    // for systems to use.
+    let (sender, receiver) = tokio::sync::mpsc::channel::<Message>(10);
+    commands.insert_resource(receiver);
+
+    runtime.spawn(async move {
         let socket = TcpSocket::new_v4().unwrap();
         let mut stream = socket
             .connect("127.0.0.1:1234".parse().unwrap())
@@ -32,8 +78,9 @@ pub fn networking(runtime: Res<Runtime>) {
         let logged_in = receive(&mut stream).await;
         assert!(matches!(logged_in, Ok(Message::LoggedIn { .. })));
 
-        let ships = receive(&mut stream).await;
-        assert!(matches!(ships, Ok(Message::Ships { .. })));
-        info!("Received list of the ships.");
+        loop {
+            let incoming = receive(&mut stream).await;
+            sender.send(incoming.unwrap()).await.unwrap();
+        }
     });
 }
