@@ -31,7 +31,6 @@ fn main() {
         .add_plugin(EguiPlugin)
         .add_plugin(ConsolePlugin)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
-        .add_system(controls::setup)
         // Networking
         .insert_resource(
             tokio::runtime::Builder::new_multi_thread()

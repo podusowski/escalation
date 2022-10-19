@@ -4,26 +4,7 @@ use bevy::prelude::*;
 
 use crate::{movement::Movement, Ship};
 
-pub fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
-        material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-        transform: Transform::default().looking_at(
-            Vec3 {
-                x: 0.,
-                y: 1.,
-                z: 1.,
-            },
-            Vec3::Y,
-        ),
-        ..default()
-    });
-}
-
+/// Controls current ship's movement with mouse keys.
 pub fn mouse_clicks(
     mut commands: Commands,
     buttons: Res<Input<MouseButton>>,
