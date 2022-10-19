@@ -10,4 +10,4 @@ function nuke() {
 RUST_LOG=debug cargo run -p esc_server &
 trap nuke EXIT
 
-RUST_LOG=esc_client=debug cargo run -p esc_client
+RUST_LOG=esc_client=debug cargo run --features bevy/dynamic --bin esc_client
