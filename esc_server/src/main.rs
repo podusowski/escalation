@@ -22,7 +22,7 @@ async fn main() {
     let ships = [
         esc_common::Ship {
             id: 1,
-            position: Vec3::new(1., 0., 0.),
+            position: Vec3::new(0., 0., 0.),
         },
         esc_common::Ship {
             id: 1,

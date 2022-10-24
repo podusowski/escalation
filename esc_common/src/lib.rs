@@ -26,7 +26,7 @@ pub async fn receive(stream: &mut TcpStream) -> std::io::Result<Message> {
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
 pub struct Ship {
     pub id: usize,
-    pub position: Vec3
+    pub position: Vec3,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
