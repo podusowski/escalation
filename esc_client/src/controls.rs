@@ -1,8 +1,21 @@
 use std::time::Instant;
 
 use bevy::prelude::*;
+use bevy_egui::EguiContext;
 
 use crate::{movement::Movement, Ship};
+
+#[derive(Debug)]
+pub struct SelectedShip(usize);
+
+pub fn controls_ui(
+    mut egui_context: ResMut<EguiContext>,
+    mut selected_ship: ResMut<Option<SelectedShip>>,
+) {
+    egui::Window::new("Ship").show(egui_context.ctx_mut(), |ui| {
+        ui.label(format!("selected ship: {:?}", *selected_ship));
+    });
+}
 
 /// Controls current ship's movement with mouse keys.
 pub fn mouse_clicks(
