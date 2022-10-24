@@ -46,25 +46,24 @@ pub fn mouse_clicks(
     let window = windows.get_primary().unwrap();
 
     if buttons.just_pressed(MouseButton::Left) {
-        if let Some(position) = window.cursor_position() {
-            let position = (
+        let position = window.cursor_position().map(|position| {
+            (
                 -(window.width() / 2. - position.x),
                 -(window.height() / 2. - position.y),
-            );
-            info!("fly {:?}", position);
+            )
+        });
 
-            let selected_ship = selected_ship
-                .as_ref()
-                .as_ref()
-                .and_then(|s| ships.get(s.entity).ok());
+        let selected_ship = selected_ship
+            .as_ref()
+            .as_ref()
+            .and_then(|s| ships.get(s.entity).ok());
 
-            if let Some((ship, transform)) = selected_ship {
-                commands.entity(ship).insert(Movement {
-                    start_point: transform.translation,
-                    when_started: Instant::now(),
-                    destination: Vec3::new(position.1, -position.0, 0.),
-                });
-            }
+        if let (Some(position), Some((ship, transform))) = (position, selected_ship) {
+            commands.entity(ship).insert(Movement {
+                start_point: transform.translation,
+                when_started: Instant::now(),
+                destination: Vec3::new(position.1, -position.0, 0.),
+            });
         }
     }
 }
