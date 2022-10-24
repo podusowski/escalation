@@ -26,7 +26,7 @@ async fn main() {
         },
         esc_common::Ship {
             id: 1,
-            position: Vec3::new(10., 10., 0.),
+            position: Vec3::new(0., 50., 0.),
         },
     ];
 
