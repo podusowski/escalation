@@ -1,7 +1,7 @@
 use std::net::{Ipv4Addr, SocketAddrV4};
 
 use clap::Parser;
-use esc_common::Message;
+use esc_common::{Message, Vec3};
 use tokio::net::TcpListener;
 
 #[derive(Parser)]
@@ -19,7 +19,16 @@ async fn main() {
     let addr = listener.local_addr().unwrap();
 
     // Just some hardcoded identifiers for now.
-    let ships = [1];
+    let ships = [
+        esc_common::Ship {
+            id: 1,
+            position: Vec3::new(0., 0., 0.),
+        },
+        esc_common::Ship {
+            id: 1,
+            position: Vec3::new(0., 50., 0.),
+        },
+    ];
 
     // Make sure we print the port on stderr because tests are expecting it.
     println!("listening on port: {}", addr.port());

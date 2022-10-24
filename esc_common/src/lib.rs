@@ -1,3 +1,4 @@
+pub use glam::Vec3;
 use serde::{Deserialize, Serialize};
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
@@ -22,13 +23,19 @@ pub async fn receive(stream: &mut TcpStream) -> std::io::Result<Message> {
     Ok(envelop.message)
 }
 
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
+pub struct Ship {
+    pub id: usize,
+    pub position: Vec3,
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 pub enum Message {
     Ping,
     Pong,
     Login { login: String, password: String },
     LoggedIn { id: usize },
-    Ships(Vec<u32>),
+    Ships(Vec<Ship>),
 }
 
 /// `bson` crate can't serialize `enum` directly as it doesn't appear as
