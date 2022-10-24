@@ -1,4 +1,4 @@
-use std::{ops::DerefMut, time::Instant};
+use std::time::Instant;
 
 use bevy::prelude::*;
 use bevy_egui::EguiContext;
