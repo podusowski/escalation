@@ -16,8 +16,8 @@ pub fn controls_ui(
     ships: Query<Entity, With<Ship>>,
 ) {
     if let Some(ref mut selected_ship) = *selected_ship {
-        egui::Window::new("Ship").show(egui_context.ctx_mut(), |ui| {
-            ui.label(format!("selected ship: {:?}", *selected_ship));
+        egui::Window::new("Selected ship").show(egui_context.ctx_mut(), |ui| {
+            ui.label(format!("Identifier: {:?}", *selected_ship));
 
             egui::ComboBox::from_id_source("selected_ship")
                 .selected_text("-")
