@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::{ops::DerefMut, time::Instant};
 
 use bevy::prelude::*;
 use bevy_egui::EguiContext;
@@ -6,15 +6,32 @@ use bevy_egui::EguiContext;
 use crate::{movement::Movement, Ship};
 
 #[derive(Debug)]
-pub struct SelectedShip(usize);
+pub struct SelectedShip {
+    pub entity: Entity,
+}
 
 pub fn controls_ui(
     mut egui_context: ResMut<EguiContext>,
     mut selected_ship: ResMut<Option<SelectedShip>>,
+    ships: Query<Entity, With<Ship>>,
 ) {
-    egui::Window::new("Ship").show(egui_context.ctx_mut(), |ui| {
-        ui.label(format!("selected ship: {:?}", *selected_ship));
-    });
+    if let Some(ref mut selected_ship) = *selected_ship {
+        egui::Window::new("Ship").show(egui_context.ctx_mut(), |ui| {
+            ui.label(format!("selected ship: {:?}", *selected_ship));
+
+            egui::ComboBox::from_id_source("selected_ship")
+                .selected_text("-")
+                .show_ui(ui, |ui| {
+                    for entity in ships.iter() {
+                        ui.selectable_value(
+                            &mut selected_ship.entity,
+                            entity,
+                            format!("{:?}", entity),
+                        );
+                    }
+                });
+        });
+    }
 }
 
 /// Controls current ship's movement with mouse keys.

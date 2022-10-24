@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use esc_common::{receive, send, Message};
 use tokio::{net::TcpSocket, runtime::Runtime};
 
-use crate::Ship;
+use crate::{controls::SelectedShip, Ship};
 
 /// Process incoming network messages and apply them into the game's logic.
 pub fn incoming_packets(
@@ -10,6 +10,7 @@ pub fn incoming_packets(
     mut receiver: ResMut<tokio::sync::mpsc::Receiver<Message>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut selected_ship: ResMut<Option<SelectedShip>>,
 ) {
     while let Ok(message) = receiver.try_recv() {
         info!("Received '{:?}' in Bevy system.", message);
@@ -18,7 +19,7 @@ pub fn incoming_packets(
                 info!("Received list of the ships: {:?}.", ships);
 
                 for ship in ships {
-                    commands
+                    let entity = commands
                         .spawn()
                         .insert_bundle(PbrBundle {
                             mesh: meshes.add(Mesh::from(shape::Box {
@@ -33,7 +34,10 @@ pub fn incoming_packets(
                             transform: Transform::from_translation(ship.position),
                             ..default()
                         })
-                        .insert(Ship);
+                        .insert(Ship)
+                        .id();
+
+                    *selected_ship = Some(SelectedShip { entity });
                 }
             }
             _ => {
