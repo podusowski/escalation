@@ -7,6 +7,10 @@ function nuke() {
     done
 }
 
+# Build everything first. Otherwise, server's compilation errors will go into
+# the background.
+cargo build --features bevy/dynamic
+
 RUST_LOG=debug cargo run -p esc_server &
 trap nuke EXIT
 
