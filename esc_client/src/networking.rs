@@ -17,7 +17,7 @@ pub fn incoming_packets(
             Message::Ships(ships) => {
                 info!("Received list of the ships: {:?}.", ships);
 
-                for _ship in ships {
+                for ship in ships {
                     commands
                         .spawn()
                         .insert_bundle(PbrBundle {
@@ -30,7 +30,7 @@ pub fn incoming_packets(
                                 max_z: 20.,
                             })),
                             material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-                            transform: Transform::from_translation(_ship.position),
+                            transform: Transform::from_translation(ship.position),
                             ..default()
                         })
                         .insert(Ship);
