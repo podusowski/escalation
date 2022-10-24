@@ -19,7 +19,16 @@ async fn main() {
     let addr = listener.local_addr().unwrap();
 
     // Just some hardcoded identifiers for now.
-    let ships = [esc_common::Ship{id: 1, position: Vec3::new(1., 1., 1.) }];
+    let ships = [
+        esc_common::Ship {
+            id: 1,
+            position: Vec3::new(1., 0., 0.),
+        },
+        esc_common::Ship {
+            id: 1,
+            position: Vec3::new(10., 10., 0.),
+        },
+    ];
 
     // Make sure we print the port on stderr because tests are expecting it.
     println!("listening on port: {}", addr.port());

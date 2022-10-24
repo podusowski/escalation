@@ -30,6 +30,7 @@ pub fn incoming_packets(
                                 max_z: 20.,
                             })),
                             material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+                            transform: Transform::from_translation(_ship.position),
                             ..default()
                         })
                         .insert(Ship);
