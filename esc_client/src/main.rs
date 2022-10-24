@@ -1,3 +1,4 @@
+mod controls;
 mod movement;
 mod networking;
 mod ui;
@@ -21,7 +22,7 @@ fn spawn_lights_and_camera(mut commands: Commands) {
 
 /// Marker for the ships, that is entities which can fly somewhere.
 #[derive(Component)]
-struct Ship;
+pub struct Ship;
 
 fn main() {
     App::new()
@@ -41,6 +42,7 @@ fn main() {
         .add_system(networking::incoming_packets)
         // Game logic
         .add_system(entities_movement)
+        .add_system(controls::mouse_clicks)
         // Others
         .add_startup_system(spawn_lights_and_camera)
         .run();
