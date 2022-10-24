@@ -5,6 +5,7 @@ mod ui;
 
 use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
+use controls::SelectedShip;
 use movement::entities_movement;
 use ui::ConsolePlugin;
 
@@ -43,6 +44,8 @@ fn main() {
         // Game logic
         .add_system(entities_movement)
         .add_system(controls::mouse_clicks)
+        .insert_resource::<Option<SelectedShip>>(None)
+        .add_system(controls::controls_ui)
         // Others
         .add_startup_system(spawn_lights_and_camera)
         .run();
