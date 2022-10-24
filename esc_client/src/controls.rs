@@ -53,14 +53,17 @@ pub fn mouse_clicks(
             );
             info!("fly {:?}", position);
 
-            if let Some(selected_ship) = &*selected_ship {
-                if let Ok((ship, transform)) = ships.get(selected_ship.entity) {
-                    commands.entity(ship).insert(Movement {
-                        start_point: transform.translation,
-                        when_started: Instant::now(),
-                        destination: Vec3::new(position.1, -position.0, 0.),
-                    });
-                }
+            let selected_ship = selected_ship
+                .as_ref()
+                .as_ref()
+                .and_then(|s| ships.get(s.entity).ok());
+
+            if let Some((ship, transform)) = selected_ship {
+                commands.entity(ship).insert(Movement {
+                    start_point: transform.translation,
+                    when_started: Instant::now(),
+                    destination: Vec3::new(position.1, -position.0, 0.),
+                });
             }
         }
     }
