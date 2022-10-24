@@ -15,7 +15,8 @@ pub fn controls_ui(
     mut selected_ship: ResMut<Option<SelectedShip>>,
     ships: Query<Entity, With<Ship>>,
 ) {
-    if let Some(ref mut selected_ship) = *selected_ship {
+    // TODO: Handle "unselected" cases.
+    if let Some(selected_ship) = &mut *selected_ship {
         egui::Window::new("Selected ship").show(egui_context.ctx_mut(), |ui| {
             ui.label(format!("Identifier: {:?}", *selected_ship));
 
@@ -40,6 +41,7 @@ pub fn mouse_clicks(
     buttons: Res<Input<MouseButton>>,
     windows: Res<Windows>,
     ships: Query<(Entity, &Transform), With<Ship>>,
+    selected_ship: Res<Option<SelectedShip>>,
 ) {
     let window = windows.get_primary().unwrap();
 
@@ -51,12 +53,14 @@ pub fn mouse_clicks(
             );
             info!("fly {:?}", position);
 
-            for (ship, transform) in ships.iter() {
-                commands.entity(ship).insert(Movement {
-                    start_point: transform.translation,
-                    when_started: Instant::now(),
-                    destination: Vec3::new(position.1, -position.0, 0.),
-                });
+            if let Some(selected_ship) = &*selected_ship {
+                if let Ok((ship, transform)) = ships.get(selected_ship.entity) {
+                    commands.entity(ship).insert(Movement {
+                        start_point: transform.translation,
+                        when_started: Instant::now(),
+                        destination: Vec3::new(position.1, -position.0, 0.),
+                    });
+                }
             }
         }
     }
