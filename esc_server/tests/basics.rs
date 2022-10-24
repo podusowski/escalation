@@ -1,5 +1,5 @@
 use assert_matches::assert_matches;
-use esc_common::{receive, Message};
+use esc_common::{receive, Message, Ship, Vec3};
 use std::{
     net::{Ipv4Addr, SocketAddrV4},
     process::Stdio,
@@ -126,5 +126,5 @@ async fn ping_login_and_get_ship_list() {
     assert_matches!(logged_in, Ok(esc_common::Message::LoggedIn { id: _ }));
 
     let ships = receive(&mut stream).await;
-    assert_matches!(ships, Ok(Message::Ships(ships)) if ships == [1]);
+    assert_matches!(ships, Ok(Message::Ships(ships)) if ships == [Ship{ id: 1, position: Vec3{ x: 1., y: 1., z: 1. } }]);
 }
