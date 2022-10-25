@@ -13,17 +13,21 @@ pub struct SelectedShip {
 pub fn controls_ui(
     mut egui_context: ResMut<EguiContext>,
     mut selected_ship: ResMut<Option<SelectedShip>>,
-    ships: Query<Entity, With<Ship>>,
+    ships: Query<(Entity, &Transform), With<Ship>>,
 ) {
     // TODO: Handle "unselected" cases.
     if let Some(selected_ship) = &mut *selected_ship {
         egui::Window::new("Selected ship").show(egui_context.ctx_mut(), |ui| {
-            ui.label(format!("Identifier: {:?}", *selected_ship));
+            // Selected ship might have been deleted at some point.
+            if let Ok((_, transform)) = ships.get(selected_ship.entity) {
+                ui.label(format!("Identifier: {:?}", *selected_ship));
+                ui.label(format!("{:?}", transform.translation));
+            }
 
             egui::ComboBox::from_id_source("selected_ship")
                 .selected_text("-")
                 .show_ui(ui, |ui| {
-                    for entity in ships.iter() {
+                    for (entity, _) in ships.iter() {
                         ui.selectable_value(
                             &mut selected_ship.entity,
                             entity,
